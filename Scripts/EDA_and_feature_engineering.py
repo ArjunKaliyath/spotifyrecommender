@@ -5,9 +5,8 @@ import seaborn as sns
 import re
 from sklearn.preprocessing import StandardScaler
 
-# ============================
-# Part 1: EDA for Random Dataset (df1)
-# ============================
+
+# Part 1: EDA for Training Dataset (df1)
 
 # --- Load the Training Dataset ---
 df1 = pd.read_csv('/data/train.csv')
@@ -164,14 +163,14 @@ plt.ylabel("Count")
 plt.xticks(rotation=45)
 plt.show()
 
-# ============================
-# Part 2: EDA for Top 10k Dataset (df2) - Trend Analysis Across Decades
-# ============================
 
-# --- Load the Top 10k Dataset ---
+# EDA for df2 - Trend Analysis Across Decades
+
+
+# load the df2 dataset
 df2 = pd.read_csv('/data/top_10000_1950-now.csv')
 
-# --- Data Cleaning for df2 ---
+# Data Cleaning for df2 
 audio_cols = ['Danceability', 'Energy', 'Loudness', 'Speechiness',
               'Acousticness', 'Instrumentalness', 'Liveness', 'Valence',
               'Tempo', 'Track Duration (ms)', 'Popularity']
@@ -179,12 +178,12 @@ df2.dropna(subset=audio_cols, inplace=True)
 df2.drop_duplicates(inplace=True)
 df2 = df2[df2['Track Duration (ms)'] > 0]
 
-# --- Feature Scaling for df1 only ---
+# Feature Scaling for df1 only 
 
 scaler = StandardScaler()
 df1[numeric_cols] = scaler.fit_transform(df1[numeric_cols].values)
 
-# --- Feature Engineering on df2 for Trend Analysis ---
+#  Feature Engineering on df2 for Trend Analysis
 # Convert 'Album Release Date' to datetime and extract year
 df2['Album Release Date'] = pd.to_datetime(df2['Album Release Date'], errors='coerce')
 df2 = df2.dropna(subset=['Album Release Date'])
@@ -198,7 +197,7 @@ df2['tempo_bucket'] = pd.cut(df2['Tempo'], bins=tempo_bins, labels=tempo_labels)
 df2['duration_min'] = df2['Track Duration (ms)'] / 60000.0
 df2['duration_cat'] = pd.cut(df2['duration_min'], bins=duration_bins, labels=duration_labels)
 
-# --- Exploratory Visualizations for df2 (Music Trends Across Decades) ---
+# Exploratory Visualizations for df2 (Music Trends Across Decades)
 
 
 # 3. Distribution of Tempo Buckets Across Decades
@@ -243,7 +242,7 @@ plt.legend(title="Feature")
 plt.grid(True)
 plt.show()
 
-# --- Summary ---
+# Summary
 print("EDA for both datasets completed.")
 print(" - df1  is now processed for training the recommendation models.")
 print(" - df2  is used for analyzing trends in music across decades.")

@@ -8,7 +8,6 @@ from tensorflow import keras
 from tensorflow.keras import layers, Model
 
 
-# ----------------------------------------------------------------------
 # The dataset has been loaded and preprocessed. It has the following features: 
 #  - Numeric audio features (e.g., 'danceability', 'energy', etc.)
 #  - Engineered features: 'tempo_bucket' and 'duration_cat'
@@ -24,8 +23,7 @@ df_train = pd.read_csv('/data/train_processed.csv')
 features = df_train[feature_cols].values  # Numeric feature matrix from df_train
 
 
-# ----------------------------------------------------------------------
-# ---------- Cosine Similarity-based Content Filtering ----------
+# Cosine Similarity-based Content Filtering 
 def recommend_cosine(seed_index, feature_matrix, k=10):
     seed_vector = feature_matrix[seed_index]
     sims = cosine_similarity(seed_vector.reshape(1, -1), feature_matrix).flatten()
@@ -40,8 +38,7 @@ print("Cosine-similarity recommendations (indices):", cosine_recs)
 if 'track_name' in df_train.columns:
     print("Recommended songs (Cosine):", df_train.iloc[cosine_recs]['track_name'].tolist())
 
-# ----------------------------------------------------------------------
-# ---------- KNN-based Content Filtering ----------
+#  KNN-based Content Filtering -
 nn_model = NearestNeighbors(n_neighbors=11, metric='euclidean')
 nn_model.fit(features)
 def recommend_knn(seed_index, model, k=10):
@@ -54,8 +51,7 @@ print("KNN recommendations (indices):", knn_recs)
 if 'track_name' in df_train.columns:
     print("Recommended songs (KNN):", df_train.iloc[knn_recs]['track_name'].tolist())
 
-# ----------------------------------------------------------------------
-# ---------- Autoencoder-based Deep Learning Model ----------
+# Autoencoder-based Deep Learning Model 
 input_dim = features.shape[1]
 encoding_dim = 16  # Dimension of the latent feature space
 
@@ -88,8 +84,7 @@ print("Autoencoder recommendations (indices):", ae_recs)
 if 'track_name' in df_train.columns:
     print("Recommended songs (Autoencoder):", df_train.iloc[ae_recs]['track_name'].tolist())
 
-# ----------------------------------------------------------------------
-# ---------- K-Means Clustering-based Recommendation ----------
+#  K-Means Clustering-based Recommendation 
 # Combine numeric features with one-hot encoded engineered features.
 # We assume df_train already contains engineered columns: 'tempo_bucket' and 'duration_cat'
 eng_features = pd.get_dummies(df_train[['tempo_bucket', 'duration_cat']], drop_first=True)
@@ -126,8 +121,7 @@ print("K-Means recommendations (indices):", kmeans_recs)
 if 'track_name' in df_train.columns:
     print("Recommended songs (K-Means):", df_train.iloc[kmeans_recs]['track_name'].tolist())
 
-# ----------------------------------------------------------------------
-# ---------- Evaluation Metrics ----------
+#  Evaluation Metrics
 def precision_at_k(recommended_indices, relevant_set, k):
     if k == 0:
         return 0.0
@@ -209,8 +203,7 @@ for model_name, rec_indices in models_recs.items():
           f"Hit Rate: {hit_str}, Diversity: {div_str}, "
           f"Novelty (avg popularity): {nov_str}, Feature similarity (distance): {fsim_str}")
 
-# ----------------------------------------------------------------------
-# --- Notes on Splitting ---
+# Notes on Splitting 
 # For these unsupervised methods (cosine similarity, KNN, clustering), a train/test split is not strictly required
 # because there is no target label. For the autoencoder model, a validation split is used during training.
 # In systems with user feedback, a proper train/test or cross-validation approach is recommended.

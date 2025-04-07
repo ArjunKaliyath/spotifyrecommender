@@ -250,3 +250,40 @@ print(" - df2 (Top 10k Dataset) is used for analyzing trends in music across dec
 
 # the processed file to be saved in the data folder
 df1.to_csv('/data/train_processed.csv',index=False)
+
+
+# Use the below code for verifying the data saved in the folder
+
+#df is the DataFrame after feature engineering and scaling.
+
+df = pd.read_csv('/content/train_processed.csv')
+# 1. Verify summary statistics for numeric columns
+numeric_cols = [
+    'popularity', 'duration_ms', 'danceability', 'energy', 'loudness',
+    'speechiness', 'acousticness', 'instrumentalness', 'liveness',
+    'valence', 'tempo', 'energy_acoustic_diff', 'valence_energy_diff'
+    # ... add any other numeric features you've scaled
+]
+
+print("Summary statistics of scaled numeric columns:")
+print(df[numeric_cols].describe())
+
+# 2. Check for null values
+null_counts = df.isnull().sum()
+print("\nNull values in each column:")
+print(null_counts[null_counts > 0])  # Only show columns with non-zero null counts
+
+# 3. Check for duplicates
+duplicate_count = df.duplicated().sum()
+print(f"\nNumber of duplicate rows: {duplicate_count}")
+
+# 4.Quick Visual Check of a Single Feature Distribution to verify the data
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(6,4))
+sns.histplot(df['energy'], kde=True)
+plt.title("Distribution of 'energy' after scaling")
+plt.show()
+
+

@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 # ============================
 
 # --- Load the Training Dataset ---
-df1 = pd.read_csv('/content/train.csv')
+df1 = pd.read_csv('/data/train.csv')
 
 # --- Initial Data Inspection ---
 print("Shape of df1:", df1.shape)
@@ -169,7 +169,7 @@ plt.show()
 # ============================
 
 # --- Load the Top 10k Dataset ---
-df2 = pd.read_csv('/content/top_10000_1950-now (1).csv')
+df2 = pd.read_csv('/data/top_10000_1950-now.csv')
 
 # --- Data Cleaning for df2 ---
 audio_cols = ['Danceability', 'Energy', 'Loudness', 'Speechiness',
@@ -248,5 +248,5 @@ print("EDA for both datasets completed.")
 print(" - df1 (Random Dataset) is now processed for training the recommendation models.")
 print(" - df2 (Top 10k Dataset) is used for analyzing trends in music across decades.")
 
-
-df1.to_csv('/content/train_processed.csv',index=False)
+# the processed file to be saved in the data folder
+df1.to_csv('/data/train_processed.csv',index=False)

@@ -54,5 +54,3 @@ A unified Streamlit application that:
 - `data/train_cleaned.csv` & `data/train_processed.csv`: Track features for EDA and recommendations.
 
 ---
-Built for a college project demonstrating interactive data exploration and simple AI-driven music recommendations.
-

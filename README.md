@@ -1,57 +1,58 @@
-# Spotify Music Recommendation System
+# Music Recommendation & EDA Dashboard
 
-## Overview
+A unified Streamlit application that:
 
-This project implements a music recommendation system using Spotify datasets:
+- **Visualizes** music trends across decades using Spotify datasets.
+- Provides **interactive EDA** for both artists and tracks.
+- Embeds a **conversational recommender chatbot** to suggest songs based on a seed track.
 
-- **Data:**
-  - **train.csv:** A large dataset of 114,000 random Spotify tracks used for training and modeling.
-  - **top_10000_1950-now.csv:** A dataset of top 10,000 Spotify tracks (from the 1950s to now) used for trend analysis and exploratory data analysis.
-  - The processed file, **train_processed.csv**, is generated during data preprocessing.
+## Features
 
-- **Tech Stack:**
-  - **Programming Language:** Python
-  - **Libraries:** NumPy, Pandas, scikit-learn, TensorFlow (Keras), Matplotlib, Seaborn
+### Trends
+- **Average Danceability**, **Tempo Buckets**, **Duration Categories**, and **Multi‑Feature Trends** over 1950s–Now.
+- Fully interactive filters for decade selection.
 
-- **Project Components:**
-  - **Data Preprocessing:** Data cleaning, feature engineering (including creation of new numerical features and bucketization/one-hot encoding of categorical variables).
-  - **Model Training & Recommendation:** Implementation and comparison of four unsupervised recommendation techniques:
-    - Cosine Similarity-based Content Filtering
-    - K-Nearest Neighbors (KNN) Filtering
-    - Autoencoder-based Deep Learning Model
-    - K-Means Clustering-based Recommendation
-  - **Evaluation:** Ranking-based evaluation using metrics such as Precision@K, Hit Rate, Diversity, Novelty, and Feature Similarity.
+### Artist EDA
+- Scatter plot of **Career Span vs Popularity**, sized by release count and colored by listener base.
+- Bar chart of **Top N Artists** by monthly listeners, with user‑configurable N.
+- **Debut Year** distribution histogram with slider control.
+- **Popularity vs Monthly Listeners** scatter, colored by primary genre.
+- Summary statistics (total artists, median listeners, etc.).
 
-## Setup
+### Track EDA
+- Configurable **feature scatter** between any two audio attributes, genre‑filtered.
+- **Popularity histogram** and **Top Artists by Track Count** bar.
+- **Boxplot** comparing explicit vs non‑explicit track popularity.
+- **Average Feature by Genre** bar chart for user‑selected audio metric.
+- Dataset overview and descriptive stats table.
 
-```bash
-pip install numpy pandas scikit-learn tensorflow matplotlib seaborn
-```
+### Conversational Recommender
+- Simple chat interface powered by `st.chat_input` and `st.chat_message`.
+- Keyword‑based intent detection (`greet`, `recommend`, `bye`).
+- Cosine‑similarity recommendations showing **Track – Artist** pairs.
 
-## Project Structure
+## Getting Started
 
-Repo Name/
-├── data/
-│   ├── train.csv
-│   ├── top_10000_1950-now.csv
-│   └── train_processed.csv
-│
-├── scripts/
-│   ├── data_preprocessing.py
-│   └── model_training.py
-│
-└── report/
-    └── [Report.pdf]
+1. **Clone the repo** and navigate into the project:
+   ```bash
+   git clone <repo-url>
+   cd cap5771sp25-project
+   ```
+2. **Install dependencies** (preferably in a venv):
+   ```bash
+   pip install streamlit pandas numpy altair seaborn matplotlib scikit-learn
+   ```
+3. **Run the app**:
+   ```bash
+   streamlit run scripts/app.py
+   ```
+4. Open `http://localhost:8501` in your browser.
 
+## Data
+- `data/top_10000_1950-now.csv`: Trend analysis across decades.
+- `data/Spotify_artist_info_cleaned.csv`: Artist metadata and popularity.
+- `data/train_cleaned.csv` & `data/train_processed.csv`: Track features for EDA and recommendations.
 
+---
+Built for a college project demonstrating interactive data exploration and simple AI-driven music recommendations.
 
-## Running Project Locally 
-
-- Navigate to Scripts folder and run below command to generate train_processed.csv
-```bash
-python data_preprocessing.py 
-```
-- Once file is generated run below command to train models
-```bash
-python model_training.py
-```

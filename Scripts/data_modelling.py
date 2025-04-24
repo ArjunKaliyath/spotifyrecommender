@@ -8,10 +8,7 @@ from tensorflow import keras
 from tensorflow.keras import layers, Model
 
 
-# The dataset has been loaded and preprocessed. It has the following features: 
-#  - Numeric audio features (e.g., 'danceability', 'energy', etc.)
-#  - Engineered features: 'tempo_bucket' and 'duration_cat'
-#  - Other columns like 'track_name', 'artist' or 'artist_name'
+
 # Here we define the numeric feature columns and extract the feature matrix.
 feature_cols = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
                 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'popularity',
@@ -55,7 +52,7 @@ if 'track_name' in df_train.columns:
 input_dim = features.shape[1]
 encoding_dim = 16  # Dimension of the latent feature space
 
-# Build the autoencoder architecture
+# autoencoder architecture
 inputs = keras.Input(shape=(input_dim,))
 x = layers.Dense(64, activation='relu')(inputs)
 encoded = layers.Dense(encoding_dim, activation='relu')(x)
@@ -64,7 +61,7 @@ decoded = layers.Dense(input_dim, activation='linear')(x)
 autoencoder = Model(inputs, decoded)
 autoencoder.compile(optimizer='adam', loss='mse')
 
-# Train the autoencoder (unsupervised training with a validation split)
+# Train the autoencoder 
 autoencoder.fit(features, features, epochs=20, batch_size=256, validation_split=0.1, verbose=0)
 
 # Extract the encoder model to get latent features
@@ -85,8 +82,6 @@ if 'track_name' in df_train.columns:
     print("Recommended songs (Autoencoder):", df_train.iloc[ae_recs]['track_name'].tolist())
 
 #  K-Means Clustering-based Recommendation 
-# Combine numeric features with one-hot encoded engineered features.
-# We assume df_train already contains engineered columns: 'tempo_bucket' and 'duration_cat'
 eng_features = pd.get_dummies(df_train[['tempo_bucket', 'duration_cat']], drop_first=True)
 
 genre_dummies = pd.get_dummies(df_train['genre_bucket'], prefix='genre')
@@ -105,12 +100,9 @@ clusters = kmeans.fit_predict(features_cluster)
 df_train['cluster'] = clusters  # Save the cluster assignments in the training DataFrame
 
 def recommend_kmeans(seed_index, features_cluster, clusters, k=10):
-    # Get the cluster of the seed track
     seed_cluster = clusters[seed_index]
-    # Find indices in the same cluster (excluding the seed)
     cluster_indices = np.where(clusters == seed_cluster)[0]
     cluster_indices = cluster_indices[cluster_indices != seed_index]
-    # Within the cluster, rank tracks by cosine similarity using the original features
     seed_vector = features[seed_index]
     sims = cosine_similarity(seed_vector.reshape(1, -1), features[cluster_indices]).flatten()
     sorted_within_cluster = cluster_indices[sims.argsort()[::-1]]
@@ -203,10 +195,7 @@ for model_name, rec_indices in models_recs.items():
           f"Hit Rate: {hit_str}, Diversity: {div_str}, "
           f"Novelty (avg popularity): {nov_str}, Feature similarity (distance): {fsim_str}")
 
-# Notes on Splitting 
-# For these unsupervised methods (cosine similarity, KNN, clustering), a train/test split is not strictly required
-# because there is no target label. For the autoencoder model, a validation split is used during training.
-# In systems with user feedback, a proper train/test or cross-validation approach is recommended.
+
 
 
 

@@ -207,3 +207,63 @@ for model_name, rec_indices in models_recs.items():
 # For these unsupervised methods (cosine similarity, KNN, clustering), a train/test split is not strictly required
 # because there is no target label. For the autoencoder model, a validation split is used during training.
 # In systems with user feedback, a proper train/test or cross-validation approach is recommended.
+
+
+
+def ndcg_at_k(recommended_indices, relevant_set, k):
+    dcg = 0.0
+    for i, idx in enumerate(recommended_indices[:k]):
+        if idx in relevant_set:
+            dcg += 1.0 / np.log2(i + 2)  # position is 1-based, hence i+2
+    ideal_dcg = sum(1.0 / np.log2(i + 2) for i in range(min(len(relevant_set), k)))
+    return dcg / ideal_dcg if ideal_dcg > 0 else 0.0
+
+# Aggregated Metrics Collection
+evaluation_metrics = {
+    "Model": [],
+    "Precision@5": [],
+    "Recall@5": [],
+    "MAP@5": [],
+    "NDCG@5": [],
+    "Hit Rate": [],
+    "Diversity": [],
+    "Novelty": [],
+    "Feature Similarity": []
+}
+
+for model_name, rec_indices in models_recs.items():
+    prec = precision_at_k(rec_indices, relevant_set, k)
+    rec = recall_at_k(rec_indices, relevant_set, k)
+    ap = average_precision(rec_indices, relevant_set, k)
+    ndcg = ndcg_at_k(rec_indices, relevant_set, k)
+    hit = hit_rate(rec_indices, relevant_set, k)
+    div = diversity(rec_indices, df_train)
+    nov = novelty(rec_indices, df_train)
+    fsim = feature_similarity(seed_idx, rec_indices, features)
+
+    evaluation_metrics["Model"].append(model_name)
+    evaluation_metrics["Precision@5"].append(prec)
+    evaluation_metrics["Recall@5"].append(rec)
+    evaluation_metrics["MAP@5"].append(ap)
+    evaluation_metrics["NDCG@5"].append(ndcg)
+    evaluation_metrics["Hit Rate"].append(hit)
+    evaluation_metrics["Diversity"].append(div)
+    evaluation_metrics["Novelty"].append(nov)
+    evaluation_metrics["Feature Similarity"].append(fsim)
+
+# Convert to DataFrame for easier plotting
+eval_df = pd.DataFrame(evaluation_metrics)
+
+# Plotting
+import matplotlib.pyplot as plt
+
+for metric in eval_df.columns[1:]:
+    plt.figure(figsize=(8, 4))
+    plt.bar(eval_df["Model"], eval_df[metric])
+    plt.title(f"{metric} Comparison Across Models")
+    plt.ylabel(metric)
+    plt.xlabel("Models")
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()

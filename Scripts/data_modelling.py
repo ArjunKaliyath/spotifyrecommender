@@ -9,13 +9,13 @@ from tensorflow.keras import layers, Model
 
 
 
-# Here we define the numeric feature columns and extract the feature matrix.
+# the numeric feature columns and extract the feature matrix.
 feature_cols = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
                 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'popularity',
                 'energy_acoustic_diff', 'valence_energy_diff']
-# df_train should be preprocessed and loaded:
+
 df_train = pd.read_csv('/data/train_processed.csv')
-# (plus any cleaning, scaling, and feature engineering)
+
 
 features = df_train[feature_cols].values  # Numeric feature matrix from df_train
 
@@ -93,7 +93,7 @@ features_cluster = np.hstack([features, eng_features.values,genre_dummies.values
 # (For demonstration, let's just print the shape of the resulting one-hot encoding.)
 print("One-hot encoded genre bucket shape:", genre_dummies.shape)
 
-# Train a K-Means clustering model (e.g., with 10 clusters)
+# Train a K-Means clustering model
 n_clusters = 10
 kmeans = KMeans(n_clusters=n_clusters, random_state=42)
 clusters = kmeans.fit_predict(features_cluster)

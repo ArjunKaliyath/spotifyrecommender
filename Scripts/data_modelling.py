@@ -28,14 +28,14 @@ def recommend_cosine(seed_index, feature_matrix, k=10):
     similar_indices = similar_indices[similar_indices != seed_index]
     return similar_indices[:k]
 
-# Example recommendation for seed index 0 using cosine similarity
+# recommendation for seed index 0 using cosine similarity
 seed_idx = 5  # Adjust the index as needed
 cosine_recs = recommend_cosine(seed_idx, features, k=5)
 print("Cosine-similarity recommendations (indices):", cosine_recs)
 if 'track_name' in df_train.columns:
     print("Recommended songs (Cosine):", df_train.iloc[cosine_recs]['track_name'].tolist())
 
-#  KNN-based Content Filtering -
+#  KNN-based Content Filtering
 nn_model = NearestNeighbors(n_neighbors=11, metric='euclidean')
 nn_model.fit(features)
 def recommend_knn(seed_index, model, k=10):
@@ -64,7 +64,7 @@ autoencoder.compile(optimizer='adam', loss='mse')
 # Train the autoencoder 
 autoencoder.fit(features, features, epochs=20, batch_size=256, validation_split=0.1, verbose=0)
 
-# Extract the encoder model to get latent features
+# Extract the encoder model
 encoder_model = Model(inputs, encoded)
 latent_features = encoder_model.predict(features)
 print("Latent feature shape:", latent_features.shape)
@@ -90,10 +90,10 @@ genre_dummies = pd.get_dummies(df_train['genre_bucket'], prefix='genre')
 features_cluster = np.hstack([features, eng_features.values,genre_dummies.values])
 
 
-# (For demonstration, let's just print the shape of the resulting one-hot encoding.)
+
 print("One-hot encoded genre bucket shape:", genre_dummies.shape)
 
-# Train a K-Means clustering model
+# K-Means clustering model
 n_clusters = 10
 kmeans = KMeans(n_clusters=n_clusters, random_state=42)
 clusters = kmeans.fit_predict(features_cluster)
@@ -179,12 +179,12 @@ for model_name, rec_indices in models_recs.items():
     ap = average_precision(rec_indices, relevant_set, k)
     hit = hit_rate(rec_indices, relevant_set, k)
 
-    # The previously defined diversity, novelty, and feature similarity functions:
+    
     div = diversity(rec_indices, df_train)
     nov = novelty(rec_indices, df_train)
     fsim = feature_similarity(seed_idx, rec_indices, features)
 
-    # Format output, using "N/A" if any metric is None.
+    
     prec_str = f"{prec:.2f}" if prec is not None else "N/A"
     hit_str = f"{hit:.2f}" if hit is not None else "N/A"
     div_str = f"{div:.2f}" if div is not None else "N/A"
@@ -240,7 +240,7 @@ for model_name, rec_indices in models_recs.items():
     evaluation_metrics["Novelty"].append(nov)
     evaluation_metrics["Feature Similarity"].append(fsim)
 
-# Convert to DataFrame for easier plotting
+
 eval_df = pd.DataFrame(evaluation_metrics)
 
 # Plotting

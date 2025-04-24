@@ -8,10 +8,9 @@ import math
 import spacy
 from sklearn.metrics.pairwise import cosine_similarity
 
-# load spaCy for simple intent detection
+
 nlp = spacy.load("en_core_web_sm")
 
-# ─── 1. DATA LOADERS ─────────────────────────────────────────────────────
 
 @st.cache_data
 def load_top_data(path):
@@ -53,7 +52,7 @@ def load_artist_data(path):
 @st.cache_data
 def load_track_data(path):
     df = pd.read_csv(path)
-    # coerce numerics
+
     numcols = ['popularity','duration_ms','danceability','energy','loudness',
                'speechiness','acousticness','instrumentalness','liveness',
                'valence','tempo']
@@ -66,7 +65,6 @@ def load_track_data(path):
 def load_train_processed(path):
     return pd.read_csv(path)
 
-# ─── 2. PLOTTING FUNCTIONS ────────────────────────────────────────────────
 
 def plot_artist_popularity(df):
     fig, ax = plt.subplots(figsize=(8,4))
@@ -75,7 +73,6 @@ def plot_artist_popularity(df):
     return fig
 
 def plot_artist_genres(df):
-    # top 20 genres by artist‐count + avg pop
     allg = [g.strip() for row in df['genres_list'] for g in row]
     counts = pd.Series(allg).value_counts().head(20)
     stats = []
@@ -161,7 +158,6 @@ def plot_track_top_artists(df,n=10):
     plt.tight_layout()
     return fig
 
-# ─── 3. FEATURE MATRIX FOR RECOMMENDER ─────────────────────────────────
 
 @st.cache_data
 def recommend_by_name(song_name: str, df: pd.DataFrame, feature_matrix: np.ndarray, k: int = 5):
@@ -173,7 +169,6 @@ def recommend_by_name(song_name: str, df: pd.DataFrame, feature_matrix: np.ndarr
     sims[idx] = -1
     rec_idxs = sims.argsort()[::-1][:k]
 
-    # return a small DataFrame of track + artist
     return df.loc[rec_idxs, ['track_name', 'artists']]
 
 @st.cache_data
@@ -195,7 +190,6 @@ def extract_intent(text):
         return "bye"
     return "fallback"
 
-# ─── 4. STREAMLIT LAYOUT ────────────────────────────────────────────────
 st.set_page_config(layout="wide", page_title="Music Dashboard + Chatbot")
 st.title("🎵 Music Dashboard & Conversational Recommender")
 
@@ -240,25 +234,6 @@ with tabs[0]:
     ).properties(height=250, title="Feature Trends")
     st.altair_chart(c4, use_container_width=True)
 
-# ─ Artist EDA ─
-# with tabs[1]:
-#     st.header("Artist Exploratory Analysis")
-#     st.pyplot(plot_artist_popularity(df_artist))
-#     st.pyplot(plot_artist_genres(df_artist))
-#     st.pyplot(plot_artist_release(df_artist))
-#     st.pyplot(plot_artist_top(df_artist, n=10))
-#     stats = {
-#         "Total artists": len(df_artist),
-#         "With genre info": df_artist['genres'].notna().sum(),
-#         "Total monthly listeners": int(df_artist['monthly_listeners'].sum()),
-#         "Median listeners": int(df_artist['monthly_listeners'].median()),
-#         "Avg popularity": df_artist['popularity'].mean(),
-#         "Median releases": df_artist[df_artist['num_releases']!=-1]['num_releases'].median(),
-#         "Avg career span": df_artist[df_artist['release_span']>0]['release_span'].mean()
-#     }
-#     st.markdown("**Summary Statistics**")
-#     st.json(stats)
-
 with tabs[1]:
     st.header("Artist Exploratory Analysis")
 
@@ -271,7 +246,7 @@ with tabs[1]:
         (df_artist['release_span'] <= sel_span[1])
     ]
 
-    # A) scatter: span vs popularity, sized by num_releases, colored by monthly listeners
+    #span vs popularity
     scatter = (
         alt.Chart(filt_art)
            .mark_circle()
@@ -287,7 +262,7 @@ with tabs[1]:
     )
     st.altair_chart(scatter)
 
-    # B) bar: top-N artists by monthly listeners
+    # top-N artists by monthly listeners
     top_n = st.number_input("Show top N artists by monthly listeners", 5, 20, 10)
     top_art = df_artist.nlargest(top_n, 'monthly_listeners')
     bar = (
@@ -302,7 +277,7 @@ with tabs[1]:
     )
     st.altair_chart(bar)
 
-    # ─── (C) Debut Year Distribution with Slider ────────────────────────
+    # Debut Year Distribution
     st.subheader("Artist Debut Year Distribution")
     min_year = int(df_artist['first_release'].min())
     max_year = int(df_artist['first_release'].max())
@@ -323,9 +298,8 @@ with tabs[1]:
     )
     st.altair_chart(hist_year, use_container_width=True)
 
-    # ─── (D) Popularity vs. Listeners by Primary Genre ───────────────────
+    #Popularity vs. Listeners
     st.subheader("Popularity vs Monthly Listeners by Genre")
-    # derive a “primary_genre” column
     df_artist['primary_genre'] = df_artist['genres_list'].apply(lambda lst: lst[0] if lst else "Unknown")
     scatter_genre = (
         alt.Chart(df_artist)
@@ -341,26 +315,10 @@ with tabs[1]:
     )
     st.altair_chart(scatter_genre, use_container_width=True)
 
-# ─ Track EDA ─
-# with tabs[2]:
-#     st.header("Track Exploratory Analysis")
-#     st.pyplot(plot_track_corr(df_track))
-#     st.pyplot(plot_track_features(df_track))
-#     st.pyplot(plot_track_popularity(df_track))
-#     st.pyplot(plot_track_top_artists(df_track, n=10))
-#     num,cat = (df_track.describe(),{
-#         "tracks":len(df_track),
-#         "artists":df_track['artists'].nunique(),
-#         "genres":df_track['track_genre'].nunique()
-#     })
-#     st.markdown("**Dataset Overview**")
-#     st.write(f"Tracks: {cat['tracks']}, Artists: {cat['artists']}, Genres: {cat['genres']}")
-#     st.dataframe(num)
 
 with tabs[2]:
     st.header("Track Exploratory Analysis")
 
-    # Let user pick any two audio features for a scatter
     feature_options = [
         'danceability','energy','loudness','speechiness',
         'acousticness','instrumentalness','liveness','valence','tempo'
@@ -401,7 +359,7 @@ with tabs[2]:
     )
     st.altair_chart(hist)
 
-    # ─── (C) Popularity by Explicit Flag ────────────────────────────────
+
     st.subheader("Popularity: Explicit vs. Non‑Explicit")
     box_explicit = (
         alt.Chart(df_track)
@@ -415,7 +373,6 @@ with tabs[2]:
     )
     st.altair_chart(box_explicit, use_container_width=True)
 
-    # ─── (D) Avg Feature by Genre ────────────────────────────────────────
     st.subheader("Average Feature Score by Genre")
     feature_options = [
         'danceability', 'energy', 'loudness', 'speechiness',
@@ -446,19 +403,17 @@ with tabs[2]:
 with tabs[3]:
     st.header("🎤 Conversational Recommender")
 
-    # 1) Initialize history
+    #Initializing  history
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # 2) Read the new user message
+    # Read the new user message
     user_msg = st.chat_input("Type a message…")
 
-    # 3) If there is new text, handle it immediately
+
     if user_msg:
-        # a) record the user turn
         st.session_state.messages.append({"role": "user", "content": user_msg})
 
-        # b) decide on a reply
         intent = extract_intent(user_msg)
         if intent == "greet":
             bot_reply = "Hey there! Tell me a song you like, and I'll recommend some tracks."
@@ -480,9 +435,7 @@ with tabs[3]:
         else:
             bot_reply = "I can recommend songs—say something like 'Recommend songs like Halo.'"
 
-        # c) record the bot turn
         st.session_state.messages.append({"role": "assistant", "content": bot_reply})
 
-    # 4) Now display **all** messages (including the one we just added)
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])

@@ -51,9 +51,29 @@ A unified Streamlit application that:
 ## Data
 - `data/top_10000_1950-now.csv`: Trend analysis across decades.
 - `data/Spotify_artist_info_cleaned.csv`: Artist metadata and popularity.
-- `data/train_cleaned.csv` & `data/train_processed.csv`: Track features for EDA and recommendations.
+- `data/train.csv` & `data/train_processed.csv`: Track features for EDA and recommendations.
 
 ---
+
+## Project Structure
+```bash
+├── data/
+│ ├── top_10000_1950-now.csv
+│ ├── Spotify_artist_info_cleaned.csv
+│ ├── train.csv
+│ ├── train_processed.csv
+├── reports/
+│ ├── Milestone1.pdf
+│ ├── Milestone2.pdf
+│ └── Milestone3.pdf
+└── scripts/
+├── app.py # Streamlit app + chatbot
+├── artist_data_visualizer.py # EDA: artist-level analyses
+├── track_data_analyzer.py # EDA: track-level analyses
+├── trend_analyzer.py # EDA: decade/trend analyses
+├── data_preprocessing.py # Feature engineering & cleaning
+└── model_training.py # Model building & evaluation
+```
 
 
 ## Documents Link (Video,PPT and Reports) - 

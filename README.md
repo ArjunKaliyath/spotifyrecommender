@@ -42,11 +42,16 @@ A unified Streamlit application that:
    ```bash
    pip install streamlit pandas numpy altair seaborn matplotlib scikit-learn
    ```
-3. **Run the app**:
+3. **Run the preprocessing step to generate train_processed.csv**
+   ```bash
+   cd data
+   python3 data_preprocessing.py
+   ```
+5. **Run the app**:
    ```bash
    streamlit run scripts/app.py
    ```
-4. Open `http://localhost:8501` in your browser.
+6. Open `http://localhost:8501` in your browser.
 
 ## Data
 - `data/top_10000_1950-now.csv`: Trend analysis across decades.

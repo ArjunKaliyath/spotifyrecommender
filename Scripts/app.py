@@ -200,7 +200,7 @@ df_track  = load_track_data("../data/train_cleaned.csv")
 df_train  = load_train_processed("../data/train_processed.csv")
 train_mat = build_recommender(df_train)
 
-tabs = st.tabs(["Trends","Artist EDA","Track EDA","Chatbot"])
+tabs = st.tabs(["Trends","Artists","Tracks","Chatbot"])
 
 # ─ Trends Tab ─
 with tabs[0]:
@@ -263,7 +263,7 @@ with tabs[1]:
     st.altair_chart(scatter)
 
     # top-N artists by monthly listeners
-    top_n = st.number_input("Show top N artists by monthly listeners", 5, 20, 10)
+    top_n = st.number_input("Show top N artists by monthly listeners", 5, 20, 5)
     top_art = df_artist.nlargest(top_n, 'monthly_listeners')
     bar = (
         alt.Chart(top_art)
@@ -300,6 +300,7 @@ with tabs[1]:
 
     #Popularity vs. Listeners
     st.subheader("Popularity vs Monthly Listeners by Genre")
+    # derive a “primary_genre” column
     df_artist['primary_genre'] = df_artist['genres_list'].apply(lambda lst: lst[0] if lst else "Unknown")
     scatter_genre = (
         alt.Chart(df_artist)
@@ -359,27 +360,13 @@ with tabs[2]:
     )
     st.altair_chart(hist)
 
-
-    st.subheader("Popularity: Explicit vs. Non‑Explicit")
-    box_explicit = (
-        alt.Chart(df_track)
-        .mark_boxplot()
-        .encode(
-            x=alt.X('explicit:N', title="Explicit"),
-            y=alt.Y('popularity:Q', title="Popularity"),
-            color='explicit:N'
-        )
-        .properties(height=300, title="Track Popularity by Explicit Flag")
-    )
-    st.altair_chart(box_explicit, use_container_width=True)
-
     st.subheader("Average Feature Score by Genre")
     feature_options = [
         'danceability', 'energy', 'loudness', 'speechiness',
         'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo'
     ]
     feat = st.selectbox("Choose feature", feature_options, index=0)
-    top_n = st.number_input("Top N genres to show", 5, 20, 10)
+    top_n = st.number_input("Top N genres to show", 5, 20, 5)
     avg_feat = (
         df_track
         .groupby('track_genre')[feat]
